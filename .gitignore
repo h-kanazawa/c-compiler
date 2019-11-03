@@ -1,3 +1,10 @@
+# https://www.sigbus.info/compilerbook
+*~
+*.o
+tmp*
+a.out
+hkcc
+
 # Prerequisites
 *.d
 
