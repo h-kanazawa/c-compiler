@@ -51,4 +51,8 @@ try 0 '1>=2;'
 try 3 '1; 2; 3;'
 try 4 '1; 2; 7-3;'
 
+try 3 'a=3; a;'
+try 8 'a=3; z=5; a+z;'
+try 13 'a=5; b=a+3; c=b+a; a=1; c;'
+
 echo OK

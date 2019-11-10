@@ -11,6 +11,7 @@
 
 typedef enum {
   TK_RESERVED, // operator
+  TK_IDENT,    // identity
   TK_NUM,      // number
   TK_EOF,      // end of file
 } TokenKind;
@@ -27,6 +28,7 @@ struct Token {
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 bool consume(char *op);
+Token *consume_ident();
 void expect(char *op);
 int expect_number(void);
 bool at_eof(void);
@@ -40,15 +42,17 @@ extern Token *token;
  */
 
 typedef enum {
-  ND_ADD, // +
-  ND_SUB, // -
-  ND_MUL, // *
-  ND_DIV, // /
-  ND_EQ,  // ==
-  ND_NE,  // !=
-  ND_LT,  // <
-  ND_LE,  // <=
-  ND_NUM, // Number
+  ND_ADD,    // +
+  ND_SUB,    // -
+  ND_MUL,    // *
+  ND_DIV,    // /
+  ND_EQ,     // ==
+  ND_NE,     // !=
+  ND_LT,     // <
+  ND_LE,     // <=
+  ND_NUM,    // Number
+  ND_ASSIGN, // =
+  ND_LVAR,   // local variable
 } NodeKind;
 
 typedef struct Node Node;
@@ -59,6 +63,7 @@ struct Node {
   Node *lhs;     // left hand side
   Node *rhs;     // right hand side
   int val;       // used when kind is ND_NUM
+  char name;     // variable name when kind is ND_LVAR
 };
 
 Node *program(void);
