@@ -5,9 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-/**
- * Tokenizer
- */
+
+/*********************************
+ * tokenize.c
+ *********************************/
 
 typedef enum {
   TK_RESERVED, // operator
@@ -28,6 +29,7 @@ struct Token {
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 bool consume(char *op);
+char *strndup(char *p, int len);
 Token *consume_ident();
 void expect(char *op);
 int expect_number(void);
@@ -37,10 +39,22 @@ Token *tokenize(void);
 extern char *user_input;
 extern Token *token;
 
-/**
- * Abstract Syntax Tree
- */
 
+/*********************************
+ * parse.c
+ *********************************/
+
+// Local variables is storesd as a linked list
+typedef struct Var Var;
+
+struct Var {
+  Var *next;
+  char *name;
+  int len;
+  int offset;
+};
+
+// Abstract Syntax Tree
 typedef enum {
   ND_ADD,    // +
   ND_SUB,    // -
@@ -52,7 +66,7 @@ typedef enum {
   ND_LE,     // <=
   ND_NUM,    // Number
   ND_ASSIGN, // =
-  ND_LVAR,   // local variable
+  ND_VAR,    // local variable
 } NodeKind;
 
 typedef struct Node Node;
@@ -63,9 +77,20 @@ struct Node {
   Node *lhs;     // left hand side
   Node *rhs;     // right hand side
   int val;       // used when kind is ND_NUM
-  char name;     // variable name when kind is ND_LVAR
+  Var *var;     // variable name when kind is ND_VAR
 };
 
-Node *program(void);
+typedef struct {
+  Node *node;
+  Var *locals;
+  int stack_size;
+} Program;
 
-void codegen(Node *node);
+Program *program(void);
+
+
+/*********************************
+ * codegen.c
+ *********************************/
+
+void codegen(Program *prog);

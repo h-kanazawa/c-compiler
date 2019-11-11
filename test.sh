@@ -55,4 +55,8 @@ try 3 'a=3; a;'
 try 8 'a=3; z=5; a+z;'
 try 13 'a=5; b=a+3; c=b+a; a=1; c;'
 
+try 3 'abc=3; abc;'
+try 8 'a1z=3; b2y=5; a1z+b2y;'
+try 13 'foo=5; bar=foo+3; baz=bar+foo; foo=1; baz;'
+
 echo OK
