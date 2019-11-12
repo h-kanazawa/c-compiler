@@ -34,6 +34,12 @@ Node *new_var(Var *var) {
   return node;
 }
 
+Node *new_unary(NodeKind kind, Node *expr) {
+  Node *node = new_node(kind);
+  node->lhs = expr;
+  return node;
+}
+
 Var *find_lvar(Token *tok) {
   for (Var *var = locals; var; var = var->next)
     if (var->len == tok->len && !memcmp(tok->str, var->name, var->len))
@@ -78,8 +84,15 @@ Program *program() {
   return prog;
 }
 
-// stmt = expr ";"
+// stmt = "return" expr ";"
+//      | expr ";"
 Node *stmt() {
+  if (consume("return")) {
+    Node *node = new_unary(ND_RETURN, expr());
+    expect(";");
+    return node;
+  }
+
   Node *node = expr();
   expect(";");
   return node;
