@@ -71,4 +71,6 @@ try 5 'a=2; if (a) return a+3; return a+6;'
 try 3 'if (1) a=3; else a=2; return a;'
 try 2 'if (3 >= 4) a=3; else a=2; return a;'
 
+try 10 'i=0; while(i<10) i=i+1; return i;'
+
 echo OK
