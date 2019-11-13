@@ -59,5 +59,16 @@ try 13 'foo=5; bar=foo+3; baz=bar+foo; foo=1; return baz;'
 try 1 'return 1; 2; 3;'
 try 2 '1; return 2; 3;'
 try 3 '1; 2; return 3;'
+try 4 'return 4; return 3;'
+
+try 4 'if (1 > 0) return 4; return 5;'
+try 5 'if (1 < 0) return 4; return 5;'
+try 4 'if (1) return 4; return 5;'
+try 5 'if (0) return 4; return 5;'
+try 2 'a=0; if (a) return a+1; return a+2;'
+try 5 'a=2; if (a) return a+3; return a+6;'
+
+try 3 'if (1) a=3; else a=2; return a;'
+try 2 'if (3 >= 4) a=3; else a=2; return a;'
 
 echo OK
