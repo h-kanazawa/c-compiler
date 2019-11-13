@@ -70,6 +70,7 @@ typedef enum {
   ND_RETURN, // "return"
   ND_IF,     // "if"
   ND_WHILE,  // "while"
+  ND_FOR,    // "for"
 } NodeKind;
 
 typedef struct Node Node;
@@ -80,10 +81,12 @@ struct Node {
   Node *lhs;     // left hand side
   Node *rhs;     // right hand side
 
-  // "if" or "while" statement
+  // "if", "while" or "for" statement
   Node *cond;
   Node *then;
   Node *els;
+  Node *init;
+  Node *inc;
 
   int val;       // used when kind is ND_NUM
   Var *var;     // variable name when kind is ND_VAR
