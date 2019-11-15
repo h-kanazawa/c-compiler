@@ -72,6 +72,7 @@ typedef enum {
   ND_WHILE,  // "while"
   ND_FOR,    // "for"
   ND_BLOCK,  // "{" ... "}"
+  ND_FUNCALL,// Function call
 } NodeKind;
 
 typedef struct Node Node;
@@ -91,6 +92,9 @@ struct Node {
 
   // Block
   Node *body;
+
+  // Function call
+  char *funcname;
 
   int val;       // used when kind is ND_NUM
   Var *var;     // variable name when kind is ND_VAR
