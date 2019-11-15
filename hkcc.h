@@ -33,6 +33,7 @@ char *strndup(char *p, int len);
 Token *consume_ident();
 void expect(char *op);
 int expect_number(void);
+char *expect_ident();
 bool at_eof(void);
 Token *tokenize(void);
 
@@ -101,17 +102,20 @@ struct Node {
   Var *var;     // variable name when kind is ND_VAR
 };
 
-typedef struct {
+typedef struct Function Function;
+struct Function {
+  Function *next;
+  char *name;
   Node *node;
   Var *locals;
   int stack_size;
-} Program;
+};
 
-Program *program(void);
+Function *program();
 
 
 /*********************************
  * codegen.c
  *********************************/
 
-void codegen(Program *prog);
+void codegen(Function *prog);
