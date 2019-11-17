@@ -49,10 +49,15 @@ extern Token *token;
 typedef struct Var Var;
 
 struct Var {
-  Var *next;
   char *name;
   int len;
   int offset;
+};
+
+typedef struct VarList VarList;
+struct VarList {
+  VarList *next;
+  Var *var;
 };
 
 // Abstract Syntax Tree
@@ -107,7 +112,8 @@ struct Function {
   Function *next;
   char *name;
   Node *node;
-  Var *locals;
+  VarList *params;
+  VarList *locals;
   int stack_size;
 };
 
