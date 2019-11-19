@@ -281,7 +281,7 @@ Node *mul() {
   }
 }
 
-// unary = ("+" | "-")? unary
+// unary = ("+" | "-" | "*" | "&")? unary
 Node *unary() {
   if (consume("+"))
     return unary();
@@ -290,6 +290,14 @@ Node *unary() {
   tok = tok = consume("-");
   if (tok)
     return new_binary(ND_SUB, new_num(0, tok), unary(), tok);
+
+  tok = consume("&");
+  if (tok)
+    return new_unary(ND_ADDR, unary(), tok);
+
+  tok = consume("*");
+  if (tok)
+    return new_unary(ND_DEREF, unary(), tok);
 
   return primary();
 }

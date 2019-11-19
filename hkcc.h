@@ -80,6 +80,8 @@ typedef enum {
   ND_FOR,    // "for"
   ND_BLOCK,  // "{" ... "}"
   ND_FUNCALL,// Function call
+  ND_ADDR,   // unary &
+  ND_DEREF,  // unary *
 } NodeKind;
 
 typedef struct Node Node;
