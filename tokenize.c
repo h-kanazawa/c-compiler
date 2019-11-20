@@ -49,11 +49,14 @@ char *strndup(char *p, int len) {
   return buf;
 }
 
+Token *peek(char *s) {
+  if (token->kind != TK_RESERVED || strlen(s) != token->len || memcmp(token->str, s, token->len))
+    return NULL;
+  return token;
+}
 
 Token *consume(char *op) {
-  if (token->kind != TK_RESERVED ||
-      strlen(op) != token->len ||
-      memcmp(token->str, op, token->len))
+  if (!peek(op))
     return NULL;
   Token *t = token;
   token = token->next;
@@ -69,9 +72,7 @@ Token *consume_ident() {
 }
 
 void expect(char *op) {
-  if (token->kind != TK_RESERVED ||
-      strlen(op) != token->len ||
-      memcmp(token->str, op, token->len))
+  if (!peek(op))
     error_tok(token, "is not \"%s\"", op);
   token = token->next;
 }
@@ -157,6 +158,12 @@ Token *tokenize() {
     }
 
     if (startswith(p, "for") && !is_alnum(p[3])) {
+      cur = new_token(TK_RESERVED, cur, p, 3);
+      p += 3;
+      continue;
+    }
+
+    if (startswith(p, "int") && !is_alnum(p[3])) {
       cur = new_token(TK_RESERVED, cur, p, 3);
       p += 3;
       continue;
