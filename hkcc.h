@@ -38,6 +38,7 @@ void expect(char *op);
 int expect_number(void);
 char *expect_ident();
 bool at_eof(void);
+Token *new_token(TokenKind kind, Token *cur, char *str, int len);
 Token *tokenize(void);
 
 extern char *user_input;
@@ -53,7 +54,6 @@ typedef struct Var Var;
 
 struct Var {
   char *name;
-  int len;
   Type *ty;
   int offset;
 };
@@ -66,26 +66,27 @@ struct VarList {
 
 // Abstract Syntax Tree
 typedef enum {
-  ND_ADD,    // +
-  ND_SUB,    // -
-  ND_MUL,    // *
-  ND_DIV,    // /
-  ND_EQ,     // ==
-  ND_NE,     // !=
-  ND_LT,     // <
-  ND_LE,     // <=
-  ND_NUM,    // Number
-  ND_ASSIGN, // =
-  ND_VAR,    // local variable
-  ND_RETURN, // "return"
-  ND_IF,     // "if"
-  ND_WHILE,  // "while"
-  ND_FOR,    // "for"
-  ND_BLOCK,  // "{" ... "}"
-  ND_FUNCALL,// Function call
-  ND_ADDR,   // unary &
-  ND_DEREF,  // unary *
-  ND_NULL,   // Empty statement
+  ND_ADD,       // +
+  ND_SUB,       // -
+  ND_MUL,       // *
+  ND_DIV,       // /
+  ND_EQ,        // ==
+  ND_NE,        // !=
+  ND_LT,        // <
+  ND_LE,        // <=
+  ND_NUM,       // Number
+  ND_ASSIGN,    // =
+  ND_VAR,       // local variable
+  ND_RETURN,    // "return"
+  ND_IF,        // "if"
+  ND_WHILE,     // "while"
+  ND_FOR,       // "for"
+  ND_BLOCK,     // "{" ... "}"
+  ND_FUNCALL,   // Function call
+  ND_EXPR_STMT, // Expression statement
+  ND_ADDR,      // unary &
+  ND_DEREF,     // unary *
+  ND_NULL,      // Empty statement
 } NodeKind;
 
 typedef struct Node Node;

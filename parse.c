@@ -154,7 +154,12 @@ Node *declaration() {
   Node *rhs = expr();
   expect(";");
   Node *node = new_binary(ND_ASSIGN, lhs, rhs, tok);
-  return new_unary(ND_ASSIGN, node, tok);
+  return new_unary(ND_EXPR_STMT, node, tok);
+}
+
+Node *read_expr_stmt() {
+  Token *tok = token;
+  return new_unary(ND_EXPR_STMT, expr(), tok);
 }
 
 // stmt = "return" expr ";"
@@ -200,7 +205,7 @@ Node *stmt() {
     Node *node = new_node(ND_FOR, tok);
     expect("(");
     if (!consume(";")) {
-      node->init = expr();
+      node->init = read_expr_stmt();
       expect(";");
     }
     if (!consume(";")) {
@@ -208,7 +213,7 @@ Node *stmt() {
       expect(";");
     }
     if (!consume(")")) {
-      node->inc = expr();
+      node->inc = read_expr_stmt();
       expect(")");
     }
     node->then = stmt();
@@ -235,7 +240,7 @@ Node *stmt() {
   if (tok)
     return declaration();
 
-  Node *node = expr();
+  Node *node = read_expr_stmt();
   expect(";");
   return node;
 }
@@ -326,7 +331,7 @@ Node *unary() {
     return unary();
 
   Token *tok;
-  tok = tok = consume("-");
+  tok = consume("-");
   if (tok)
     return new_binary(ND_SUB, new_num(0, tok), unary(), tok);
 

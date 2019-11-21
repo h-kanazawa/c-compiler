@@ -181,19 +181,19 @@ Token *tokenize() {
       continue;
     }
 
-    if (isdigit(*p)) {
-      cur = new_token(TK_NUM, cur, p, 0);
-      char *q = p;
-      cur->val = strtol(p, &p, 10);
-      cur->len = p - q;
-      continue;
-    }
-
     if (is_alpha(*p)) {
       char *q = p++;
       while (is_alnum(*p))
         p++;
       cur = new_token(TK_IDENT, cur, q, p - q);
+      continue;
+    }
+
+    if (isdigit(*p)) {
+      cur = new_token(TK_NUM, cur, p, 0);
+      char *q = p;
+      cur->val = strtol(p, &p, 10);
+      cur->len = p - q;
       continue;
     }
 
