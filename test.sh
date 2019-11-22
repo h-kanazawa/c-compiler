@@ -116,6 +116,21 @@ try 8 'int main() { int x=3; int y=5; return foo(&x, y); } int foo(int *x, int y
 try 8 'int main() { int x; return sizeof(x); }'
 try 8 'int main() { int x; return sizeof x; }'
 try 8 'int main() { int *x; return sizeof(x); }'
+
+try 3 'int main() { int x[2]; int *y=&x; *y=3; return *x; }'
+
+try 3 'int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *x; }'
+try 4 'int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *(x+1); }'
+try 5 'int main() { int x[3]; *x=3; *(x+1)=4; *(x+2)=5; return *(x+2); }'
+
+try 0 'int main() { int x[2][3]; int *y=x; *y=0; return **x; }'
+try 1 'int main() { int x[2][3]; int *y=x; *(y+1)=1; return *(*x+1); }'
+try 2 'int main() { int x[2][3]; int *y=x; *(y+2)=2; return *(*x+2); }'
+try 3 'int main() { int x[2][3]; int *y=x; *(y+3)=3; return **(x+1); }'
+try 4 'int main() { int x[2][3]; int *y=x; *(y+4)=4; return *(*(x+1)+1); }'
+try 5 'int main() { int x[2][3]; int *y=x; *(y+5)=5; return *(*(x+1)+2); }'
+try 6 'int main() { int x[2][3]; int *y=x; *(y+6)=6; return **(x+2); }'
+
 # try 32 'int main() { int x[4]; return sizeof(x); }'
 # try 96 'int main() { int x[3][4]; return sizeof(x); }'
 # try 32 'int main() { int x[3][4]; return sizeof(*x); }'
