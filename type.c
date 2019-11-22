@@ -91,7 +91,7 @@ void visit(Node *node) {
     case ND_SIZEOF:
       node->kind = ND_NUM;
       node->ty = int_type();
-      node->val = sizeof(node->lhs->ty);
+      node->val = size_of(node->lhs->ty);
       node->lhs = NULL;
       return;
   }
