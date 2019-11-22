@@ -348,15 +348,21 @@ Node *unary() {
 
 // primary = "(" expr ")"
 //         | ident func-args?
+//         | "sizeof" unary
 //         | num
 Node *primary() {
+  Token *tok;
+
   if (consume("(")) {
     Node *node = expr();
     expect(")");
     return node;
   }
 
-  Token *tok;
+  tok = consume("sizeof");
+  if (tok)
+    return new_unary(ND_SIZEOF, unary(), tok);
+
   tok = consume_ident();
   if (tok) {
     if (consume("(")) {

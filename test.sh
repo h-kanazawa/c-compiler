@@ -113,4 +113,15 @@ try 7 'int main() { int x=3; int y=5; *(&x+1)=7; return y; }'
 try 7 'int main() { int x=3; int y=5; *(&y-1)=7; return x; }'
 try 8 'int main() { int x=3; int y=5; return foo(&x, y); } int foo(int *x, int y) { return *x + y; }'
 
+try 8 'int main() { int x; return sizeof(x); }'
+try 8 'int main() { int x; return sizeof x; }'
+try 8 'int main() { int *x; return sizeof(x); }'
+# try 32 'int main() { int x[4]; return sizeof(x); }'
+# try 96 'int main() { int x[3][4]; return sizeof(x); }'
+# try 32 'int main() { int x[3][4]; return sizeof(*x); }'
+# try 8 'int main() { int x[3][4]; return sizeof(**x); }'
+# try 9 'int main() { int x[3][4]; return sizeof(**x) + 1; }'
+# try 9 'int main() { int x[3][4]; return sizeof **x + 1; }'
+# try 8 'int main() { int x[3][4]; return sizeof(**x + 1); }'
+
 echo OK

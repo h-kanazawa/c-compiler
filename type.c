@@ -70,6 +70,12 @@ void visit(Node *node) {
         error_tok(node->tok, "invalid pointer dereference");
       node->ty = node->lhs->ty->base;
       return;
+    case ND_SIZEOF:
+      node->kind = ND_NUM;
+      node->ty = int_type();
+      node->val = sizeof(node->lhs->ty);
+      node->lhs = NULL;
+      return;
   }
 }
 
