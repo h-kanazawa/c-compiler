@@ -65,6 +65,7 @@ Node *relational();
 Node *add();
 Node *mul();
 Node *unary();
+Node *postfix();
 Node *primary();
 Node *func_args();
 
@@ -340,6 +341,7 @@ Node *mul() {
 }
 
 // unary = ("+" | "-" | "*" | "&")? unary
+//       | postfix
 Node *unary() {
   if (consume("+"))
     return unary();
@@ -357,7 +359,21 @@ Node *unary() {
   if (tok)
     return new_unary(ND_DEREF, unary(), tok);
 
-  return primary();
+  return postfix();
+}
+
+// postfix = primary ("[" expr "]")*
+Node *postfix() {
+  Node *node = primary();
+  Token *tok;
+
+  while (tok = consume("[")) {
+    // x[y] is short for *(x+y)
+    Node *exp = new_binary(ND_ADD, node, expr(), tok);
+    expect("]");
+    node = new_unary(ND_DEREF, exp, tok);
+  }
+  return node;
 }
 
 // primary = "(" expr ")"
