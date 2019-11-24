@@ -169,6 +169,12 @@ Token *tokenize() {
       continue;
     }
 
+    if (startswith(p, "char") && !is_alnum(p[4])) {
+      cur = new_token(TK_RESERVED, cur, p, 4);
+      p += 4;
+      continue;
+    }
+
     if (startswith(p, "sizeof") && !is_alnum(p[6])) {
       cur = new_token(TK_RESERVED, cur, p, 6);
       p += 6;
