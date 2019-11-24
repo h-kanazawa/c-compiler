@@ -50,12 +50,14 @@ extern Token *token;
  * parse.c
  *********************************/
 
-// Local variables is storesd as a linked list
 typedef struct Var Var;
 
 struct Var {
   char *name;
   Type *ty;
+  bool is_local;
+
+  // local variable
   int offset;
 };
 
@@ -129,7 +131,12 @@ struct Function {
   int stack_size;
 };
 
-Function *program();
+typedef struct {
+  VarList *globals;
+  Function *fns;
+} Program;
+
+Program *program();
 
 /*********************************
  * typing.c
@@ -148,10 +155,10 @@ Type *pointer_to(Type *base);
 Type *array_of(Type *base, int size);
 int size_of(Type *ty);
 
-void add_type(Function *prog);
+void add_type(Program *prog);
 
 /*********************************
  * codegen.c
  *********************************/
 
-void codegen(Function *prog);
+void codegen(Program *prog);
