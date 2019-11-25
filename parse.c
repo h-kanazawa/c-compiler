@@ -120,6 +120,13 @@ Program *program() {
   return prog;
 }
 
+char *new_label() {
+  static int cnt = 0;
+  char buf[20];
+  sprintf(buf, ".L.data.%d", cnt++);
+  return strndup(buf, 20);
+}
+
 // basetype = ("char" | "int") "*"*
 Type *basetype() {
   Type *ty;
@@ -433,6 +440,7 @@ Node *postfix() {
 //         | ident func-args?
 //         | "sizeof" unary
 //         | num
+//         | str
 Node *primary() {
   Token *tok;
 
@@ -463,6 +471,17 @@ Node *primary() {
   }
 
   tok = token;
+
+  if (tok->kind == TK_STR) {
+    token = token->next;
+
+    Type *ty = array_of(char_type(), tok->cont_len);
+    Var *var = push_var(new_label(), ty, false);
+    var->contents = tok->contents;
+    var->cont_len = tok->cont_len;
+    return new_var(var, tok);
+  }
+
   if (tok->kind != TK_NUM)
     error_tok(tok, "expected expression");
 

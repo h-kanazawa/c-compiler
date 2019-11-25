@@ -201,6 +201,21 @@ Token *tokenize() {
       continue;
     }
 
+    // String literal
+    if (*p == '"') {
+      char *q = p++;
+      while (*p && *p != '"')
+        p++;
+      if (!*p)
+        error_at(q, "unclosed string literal");
+      p++;
+
+      cur = new_token(TK_STR, cur, q, p - q);
+      cur->contents = strndup(q + 1, p - q - 2);
+      cur->cont_len = p - q - 1;
+      continue;
+    }
+
     if (isdigit(*p)) {
       cur = new_token(TK_NUM, cur, p, 0);
       char *q = p;
