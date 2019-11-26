@@ -200,6 +200,23 @@ Token *tokenize() {
       continue;
     }
 
+    // Skip line comments.
+    if (startswith(p, "//")) {
+      p += 2;
+      while (*p != '\n')
+        p++;
+      continue;
+    }
+
+    // Skip block comments.
+    if (startswith(p, "/*")) {
+      char *q = strstr(p + 2, "*/");
+      if (!q)
+        error_at(p, "unclosed block comment");
+      p = q + 2;
+      continue;
+    }
+
     // Keyword
     if (startswith(p, "return") && !is_alnum(p[6])) {
       cur = new_token(TK_RESERVED, cur, p, 6);
