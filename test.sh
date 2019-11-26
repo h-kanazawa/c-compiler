@@ -190,5 +190,9 @@ try 106 'int main() { return "\j"[0]; }'
 try 107 'int main() { return "\k"[0]; }'
 try 108 'int main() { return "\l"[0]; }'
 
+try 0 'int main() { return ({ 0; }); }'
+try 2 'int main() { return ({ 0; 1; 2; }); }'
+try 1 'int main() { ({ 0; return 1; 2; }); return 3; }'
+try 3 'int main() { return ({ int x=3; x; }); }'
 
 echo OK

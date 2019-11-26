@@ -88,6 +88,7 @@ Node *mul();
 Node *unary();
 Node *postfix();
 Node *primary();
+Node *stmt_expr();
 Node *func_args();
 
 bool is_function() {
@@ -436,7 +437,8 @@ Node *postfix() {
   return node;
 }
 
-// primary = "(" expr ")"
+// primary = "(" "{" stmt-expr-tail
+//         | "(" expr ")"
 //         | ident func-args?
 //         | "sizeof" unary
 //         | num
@@ -444,7 +446,10 @@ Node *postfix() {
 Node *primary() {
   Token *tok;
 
-  if (consume("(")) {
+  tok = consume("(");
+  if (tok) {
+    if (consume("{"))
+      return stmt_expr(tok);
     Node *node = expr();
     expect(")");
     return node;
@@ -486,6 +491,28 @@ Node *primary() {
     error_tok(tok, "expected expression");
 
   return new_num(expect_number(), tok);
+}
+
+// stmt-expr = "(" "{" stmt-expr-tail
+//
+// stmt-expr-tail = stmt stmt* "}" ")"
+//
+// Statement expression is a GNU C extension.
+Node *stmt_expr(Token *tok) {
+  Node *node = new_node(ND_STMT_EXPR, tok);
+  node->body = stmt();
+  Node *cur = node->body;
+
+  while (!consume("}")) {
+    cur->next = stmt();
+    cur = cur->next;
+  }
+  expect(")");
+
+  if (cur->kind != ND_EXPR_STMT)
+    error_tok(cur->tok, "stmt expr returning void is not supported");
+  *cur = *cur->lhs;
+  return node;
 }
 
 // funcargs = "(" (assign ("," assign)*)? ")"
