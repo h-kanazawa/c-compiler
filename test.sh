@@ -205,4 +205,8 @@ try 2 'int main() {
 try 2 'int main() { // return 1;
 return 2; }'
 
+try 2 'int main() { int x=2; { int x=3; } return x; }'
+try 2 'int main() { int x=2; { int x=3; } { int y=4; return x; }}'
+try 3 'int main() { int x=2; { x=3; } return x; }'
+
 echo OK

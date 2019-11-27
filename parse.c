@@ -2,20 +2,48 @@
 
 VarList *locals;
 VarList *globals;
+VarList *scope;
 
+// Find a variable by name.
 Var *find_var(Token *tok) {
-  for (VarList *vl = locals; vl; vl = vl->next) {
-    Var *var = vl->var;
-    if (strlen(var->name) == tok->len && !memcmp(tok->str, var->name, tok->len))
-      return var;
-  }
-
-  for (VarList *vl = globals; vl; vl = vl->next) {
+  for (VarList *vl = scope; vl; vl = vl->next) {
     Var *var = vl->var;
     if (strlen(var->name) == tok->len && !memcmp(tok->str, var->name, tok->len))
       return var;
   }
   return NULL;
+}
+
+Node *new_node(NodeKind kind, Token *tok) {
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = kind;
+  node->tok = tok;
+  return node;
+}
+
+Node *new_binary(NodeKind kind, Node *lhs, Node *rhs, Token *tok) {
+  Node *node = new_node(kind, tok);
+  node->lhs = lhs;
+  node->rhs = rhs;
+  return node;
+}
+
+Node *new_unary(NodeKind kind, Node *expr, Token *tok) {
+  Node *node = new_node(kind, tok);
+  node->lhs = expr;
+  return node;
+}
+
+Node *new_num(int val, Token *tok) {
+  Node *node = new_node(ND_NUM, tok);
+  node->val = val;
+  return node;
+}
+
+Node *new_var(Var *var, Token *tok) {
+  Node *node = new_node(ND_VAR, tok);
+  node->var = var;
+  return node;
 }
 
 Var *push_var(char *name, Type *ty, bool is_local) {
@@ -35,43 +63,19 @@ Var *push_var(char *name, Type *ty, bool is_local) {
     globals = vl;
   }
 
+  VarList *sc = calloc(1, sizeof(VarList));
+  sc->var = var;
+  sc->next = scope;
+  scope = sc;
+
   return var;
 }
 
-Node *new_node(NodeKind kind, Token *tok) {
-  Node *node = calloc(1, sizeof(Node));
-  node->kind = kind;
-  node->tok = tok;
-  return node;
-}
-
-Node *new_binary(NodeKind kind, Node *lhs, Node *rhs, Token *tok) {
-  Node *node = new_node(kind, tok);
-  node->lhs = lhs;
-  node->rhs = rhs;
-  return node;
-}
-
-Node *new_num(int val, Token *tok) {
-  Node *node = new_node(ND_NUM, tok);
-  node->val = val;
-  return node;
-}
-
-Node *new_var(Var *var, Token *tok) {
-  Node *node = new_node(ND_VAR, tok);
-  node->var = var;
-  return node;
-}
-
-Node *new_unary(NodeKind kind, Node *expr, Token *tok) {
-  Node *node = new_node(kind, tok);
-  node->lhs = expr;
-  return node;
-}
-
-bool is_typename() {
-  return peek("char") || peek("int");
+char *new_label() {
+  static int cnt = 0;
+  char buf[20];
+  sprintf(buf, ".L.data.%d", cnt++);
+  return strndup(buf, 20);
 }
 
 Function *function();
@@ -90,6 +94,10 @@ Node *postfix();
 Node *primary();
 Node *stmt_expr();
 Node *func_args();
+
+bool is_typename() {
+  return peek("char") || peek("int");
+}
 
 bool is_function() {
   Token *tok = token;
@@ -119,13 +127,6 @@ Program *program() {
   prog->globals = globals;
   prog->fns = head.next;
   return prog;
-}
-
-char *new_label() {
-  static int cnt = 0;
-  char buf[20];
-  sprintf(buf, ".L.data.%d", cnt++);
-  return strndup(buf, 20);
 }
 
 // basetype = ("char" | "int") "*"*
@@ -248,7 +249,7 @@ Node *read_expr_stmt() {
 Node *stmt() {
   Token *tok;
 
-  tok =  consume("return");
+  tok = consume("return");
   if (tok) {
     Node *node = new_unary(ND_RETURN, expr(), tok);
     expect(";");
@@ -303,10 +304,12 @@ Node *stmt() {
     head.next = NULL;
     Node *cur = &head;
 
+    VarList *sc = scope;
     while (!consume("}")) {
       cur->next = stmt();
       cur = cur->next;
     }
+    scope = sc;
 
     Node *node = new_node(ND_BLOCK, tok);
     node->body = head.next;
@@ -499,6 +502,8 @@ Node *primary() {
 //
 // Statement expression is a GNU C extension.
 Node *stmt_expr(Token *tok) {
+  VarList *sc = scope;
+
   Node *node = new_node(ND_STMT_EXPR, tok);
   node->body = stmt();
   Node *cur = node->body;
@@ -508,6 +513,8 @@ Node *stmt_expr(Token *tok) {
     cur = cur->next;
   }
   expect(")");
+
+  scope = sc;
 
   if (cur->kind != ND_EXPR_STMT)
     error_tok(cur->tok, "stmt expr returning void is not supported");
