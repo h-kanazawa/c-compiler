@@ -1,8 +1,9 @@
 #include "hkcc.h"
 
-int labelseq = 0;
 char *argreg1[] = {"dil", "sil", "dl", "cl", "r8b", "r9b"};
 char *argreg8[] = {"rdi", "rsi", "rdx", "rcx", "r8", "r9"};
+
+int labelseq = 0;
 char *funcname;
 
 void gen(Node *node);
@@ -152,7 +153,19 @@ void gen(Node *node) {
       for (int i = nargs - 1; i >= 0; i--)
         printf("  pop %s\n", argreg8[i]);
 
+      int seq = labelseq++;
+      printf("  mov rax, rsp\n");
+      printf("  and rax, 15\n");
+      printf("  jnz .Lcall%d\n", seq);
+      printf("  mov rax, 0\n");
       printf("  call %s\n", node->funcname);
+      printf("  jmp .Lend%d\n", seq);
+      printf(".Lcall%d:\n", seq);
+      printf("  sub rsp, 8\n");
+      printf("  mov rax, 0\n");
+      printf("  call %s\n", node->funcname);
+      printf("  add rsp, 8\n");
+      printf(".Lend%d:\n", seq);
       printf("  push rax\n");
       return;
     }

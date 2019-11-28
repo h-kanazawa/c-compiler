@@ -10,6 +10,11 @@ $(OBJS): hkcc.h
 test: hkcc
 	./test.sh
 
+test2: hkcc
+	./hkcc tests > tmp.s
+	gcc -static -o tmp tmp.s
+	./tmp
+
 clean:
 	rm -f hkcc *.o *~ tmp*
 
